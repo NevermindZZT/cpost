@@ -29,9 +29,9 @@ typedef struct
     void (*handler)(void);
 } CpostHandler;
 
-void cpost(void *handler);
+size_t cpost(void *handler);
 
-void cpostDelay(void *handler, size_t delay);
+size_t cpostDelay(void *handler, size_t delay);
 
 void cpostProcess(void);
 

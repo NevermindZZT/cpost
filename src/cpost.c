@@ -40,10 +40,11 @@ size_t cpostAddHandler(size_t time, void *handler)
  * 
  * @param handler handler 
  * 
+ * @return size_t 0 添加成功 -1 添加失败
  */
-void cpost(void *handler)
+size_t cpost(void *handler)
 {
-    cpostAddHandler(0, handler);
+    return cpostAddHandler(0, handler);
 }
 
 /**
@@ -52,10 +53,11 @@ void cpost(void *handler)
  * @param handler handler
  * @param delay 延时时间(tick)
  * 
+ * @return size_t 0 添加成功 -1 添加失败
  */
-void cpostDelay(void *handler, size_t delay)
+size_t cpostDelay(void *handler, size_t delay)
 {
-    cpostAddHandler(CPOST_GET_TICK() + delay, handler);
+    return cpostAddHandler(CPOST_GET_TICK() + delay, handler);
 }
 
 /**
