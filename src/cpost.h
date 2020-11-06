@@ -1,5 +1,4 @@
-/**
- * @file cpost.h
+le cpost.h
  * @author Letter (nevermindzzt@gmail.com)
  * @brief c post
  * @version 1.0.0
@@ -26,12 +25,17 @@
 typedef struct
 {
     size_t time;
-    void (*handler)(void);
+    void (*handler)(void *);
+    void *param;
 } CpostHandler;
 
 size_t cpost(void *handler);
 
 size_t cpostDelay(void *handler, size_t delay);
+
+size_t cpostEx(void *handler, void *param);
+
+size_t cpostDelayEx(void *handler, void *param, size_t delay);
 
 void cpostProcess(void);
 
