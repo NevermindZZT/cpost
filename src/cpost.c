@@ -1,4 +1,5 @@
-le cpost.c
+/**
+ * @file cpost.c
  * @author Letter (nevermindzzt@gmail.com)
  * @brief c post
  * @version 1.0.0
