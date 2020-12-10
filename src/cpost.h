@@ -30,13 +30,13 @@ typedef struct
     void *param;
 } CpostHandler;
 
-size_t cpost(void *handler);
+signed char cpost(void *handler);
 
-size_t cpostDelay(void *handler, size_t delay);
+signed char cpostDelay(void *handler, size_t delay);
 
-size_t cpostEx(void *handler, void *param);
+signed char cpostEx(void *handler, void *param);
 
-size_t cpostDelayEx(void *handler, void *param, size_t delay);
+signed char cpostDelayEx(void *handler, void *param, size_t delay);
 
 void cpostProcess(void);
 

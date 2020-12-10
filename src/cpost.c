@@ -19,9 +19,9 @@ CpostHandler cposhHandlers[CPOST_MAX_HANDLER_SIZE] = {0};
  * @param time 执行时间
  * @param handler handler
  * 
- * @return size_t 0 添加成功 -1 添加失败
+ * @return signed char 0 添加成功 -1 添加失败
  */
-size_t cpostAddHandler(size_t time, void *handler, void *param)
+signed char cpostAddHandler(size_t time, void *handler, void *param)
 {
     for (size_t i = 0; i < CPOST_MAX_HANDLER_SIZE; i++)
     {
@@ -41,9 +41,9 @@ size_t cpostAddHandler(size_t time, void *handler, void *param)
  * 
  * @param handler handler 
  * 
- * @return size_t 0 添加成功 -1 添加失败
+ * @return signed char 0 添加成功 -1 添加失败
  */
-size_t cpost(void *handler)
+signed char cpost(void *handler)
 {
     return cpostAddHandler(0, handler, NULL);
 }
@@ -54,9 +54,9 @@ size_t cpost(void *handler)
  * @param handler handler
  * @param delay 延时时间(tick)
  * 
- * @return size_t 0 添加成功 -1 添加失败
+ * @return signed char 0 添加成功 -1 添加失败
  */
-size_t cpostDelay(void *handler, size_t delay)
+signed char cpostDelay(void *handler, size_t delay)
 {
     return cpostAddHandler(CPOST_GET_TICK() + delay, handler, NULL);
 }
@@ -67,9 +67,9 @@ size_t cpostDelay(void *handler, size_t delay)
  * @param handler handler
  * @param param 参数
  * 
- * @return size_t 0 添加成功 -1 添加失败
+ * @return signed char 0 添加成功 -1 添加失败
  */
-size_t cpostEx(void *handler, void *param)
+signed char cpostEx(void *handler, void *param)
 {
     return cpostAddHandler(0, handler, param);
 }
@@ -81,9 +81,9 @@ size_t cpostEx(void *handler, void *param)
  * @param param 参数
  * @param delay 延时时间(tick)
  * 
- * @return size_t 0 添加成功 -1 添加失败
+ * @return signed char 0 添加成功 -1 添加失败
  */
-size_t cpostDelayEx(void *handler, void *param, size_t delay)
+signed char cpostDelayEx(void *handler, void *param, size_t delay)
 {
     return cpostAddHandler(CPOST_GET_TICK() + delay, handler, param);
 }
