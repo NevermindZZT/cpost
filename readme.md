@@ -82,7 +82,7 @@ _cevent_end = .;
 post接口会将函数抛出，然后在`cpostProcess`中立刻执行
 
 ```c
-size_t cpost(void *handler);
+signed char cpost(void *handler);
 ```
 
 - 参数
@@ -91,10 +91,10 @@ size_t cpost(void *handler);
 
 - 返回值
 
-  - `size_t` 0 post成功 -1 post失败
+  - `signed char` 0 post成功 -1 post失败
 
 ```c
-size_t cpostEx(void *handler, void *param);
+signed char cpostEx(void *handler, void *param);
 ```
 
 - 参数
@@ -104,14 +104,14 @@ size_t cpostEx(void *handler, void *param);
 
 - 返回值
 
-  - `size_t` 0 post成功 -1 post失败
+  - `signed char` 0 post成功 -1 post失败
 
 ### post delay
 
 post delay接口会将函数抛出，然后在挂起在`cpostProcess`中，当延时时间达到后执行
 
 ```c
-size_t cpostDelay(void *handler, size_t delay);
+signed char cpostDelay(void *handler, size_t delay);
 ```
 
 - 参数
@@ -121,10 +121,10 @@ size_t cpostDelay(void *handler, size_t delay);
 
 - 返回值
 
-  - `size_t` 0 post成功 -1 post失败
+  - `signed char` 0 post成功 -1 post失败
 
 ```c
-size_t cpostDelayEx(void *handler, void *param, size_t delay);
+signed char cpostDelayEx(void *handler, void *param, size_t delay);
 ```
 
 - 参数
@@ -135,7 +135,7 @@ size_t cpostDelayEx(void *handler, void *param, size_t delay);
 
 - 返回值
 
-  - `size_t` 0 post成功 -1 post失败
+  - `signed char` 0 post成功 -1 post失败
 
 ### event post
 
