@@ -8,7 +8,6 @@
  * @copyright (c) 2020 Letter
  * 
  */
-#include"string.h"
 #include "cpost.h"
 
 

@@ -8,7 +8,6 @@
  * @copyright (c) 2020 Letter
  * 
  */
-#include"string.h"
 #include "cevent.h"
 
 #if defined(__CC_ARM) || (defined(__ARMCC_VERSION) && __ARMCC_VERSION >= 6000000)

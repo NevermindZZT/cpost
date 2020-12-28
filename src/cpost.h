@@ -21,7 +21,7 @@
 /**
  * @brief 获取系统tick函数
  */
-#define     CPOST_GET_TICK()            SysGetCurrentTick()
+#define     CPOST_GET_TICK()            0
 
 typedef struct
 {
