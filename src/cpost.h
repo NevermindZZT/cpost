@@ -34,9 +34,9 @@ signed char cpost(void *handler);
 
 signed char cpostDelay(void *handler, size_t delay);
 
-signed char cpostEx(void *handler, void *param);
+signed char cpostEx(void *handler, void *param, unsigned char enableDuplicate);
 
-signed char cpostDelayEx(void *handler, void *param, size_t delay);
+signed char cpostDelayEx(void *handler, void *param, size_t delay, unsigned char enableDuplicate);
 
 void cpostProcess(void);
 
@@ -44,5 +44,6 @@ void cpostRemove(void *handler);
 
 void cpostRemoveAll(void);
 
+signed char cpostIsInList(void *handler);
 #endif
 
