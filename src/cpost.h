@@ -11,7 +11,11 @@
 #ifndef __CPOST_H__
 #define __CPOST_H__
 
-#define     CPOST_VERSION               "1.0.0"
+#define     CPOST_VERSION               "1.0.1"
+
+#define     CPOST_FLAG_CLEAR_FRONT      0           // post列表中，存在相同handler, 清除之前的post
+#define     CPOST_FLAG_CANCEL_CURRENT   1           // post列表中，存在相同handler, 取消当前post
+#define     CPOST_FLAG_ADD_NEW          2           // 添加新post，不论post列表中是否存在相同handler
 
 /**
  * @brief 最大handler数量
@@ -23,6 +27,11 @@
  */
 #define     CPOST_GET_TICK()            0
 
+/**
+ * @brief tick最大值
+ */
+#define     CPOST_MAX_TICK              0xFFFFFFFF
+
 typedef struct
 {
     size_t time;
@@ -30,13 +39,40 @@ typedef struct
     void *param;
 } CpostHandler;
 
-signed char cpost(void *handler);
+typedef struct
+{
+    void *handler;
+    void *param;
+    size_t delay;
+    struct {
+        unsigned char flag : 2;
+    } attrs;
+} CpostParam;
 
-signed char cpostDelay(void *handler, size_t delay);
+/**
+ * @brief cpsot
+ * 
+ * @param ... 参数列表
+ * @note 参数按照`CpostParam`结构体进行传递
+ *       按顺序传递时，直接按照`cpost(handler, param，delay)`传参
+ *       不按顺序时，需要指定成员名，比如`cpost(handler, .delay=5000)`
+ *       属性参数必须指定成员名，比如`cpost(handler, .attrs.flag=CPOST_FLAG_CANCEL_CURRENT)`
+ * 
+ * @return signed char 0 成功 -1 失败
+ */
+#define cpost(...) \
+        cpostAddHandler(&((CpostParam){__VA_ARGS__}))
 
-signed char cpostEx(void *handler, void *param, unsigned char enableDuplicate);
+#define cpostDelay(_handler, _delay) \
+        cpost(_handler, .delay=_delay)
 
-signed char cpostDelayEx(void *handler, void *param, size_t delay, unsigned char enableDuplicate);
+#define cpostEx(_handler, _param) \
+        cpost(_handler, _param)
+
+#define cpostDelayEx(_handler, _param, _delay) \
+        cpost(_handler, _param, _delay)
+
+signed char cpostAddHandler(CpostParam *param);
 
 void cpostProcess(void);
 
