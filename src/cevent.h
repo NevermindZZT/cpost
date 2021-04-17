@@ -33,11 +33,30 @@
  * @param ... 参数
  */
 #define CEVENT_EXPORT(_event, _func, ...) \
-        const void *cEventParam##_func[] = {(void *)_func, ##__VA_ARGS__}; \
-        const CEvent SECTION("cEvent") cEvent##_func= \
+        const void *cEventParam##_event##_func[] = {(void *)_func, ##__VA_ARGS__}; \
+        const CEvent SECTION("cEvent") cEvent##_event##_func = \
         { \
-            .param = cEventParam##_func, \
-            .paramNum = sizeof(cEventParam##_func) / sizeof(void *), \
+            .param = cEventParam##_event##_func, \
+            .paramNum = sizeof(cEventParam##_event##_func) / sizeof(void *), \
+            .event = _event, \
+        }
+
+/**
+ * @brief 导出事件(解决命名冲突)
+ *        一般情况下不需要调用这个宏导出事件，当需要对同一个事件调用同一个函数时
+ *        需要使用这个宏解决命名冲突
+ * 
+ * @param _alias 命名
+ * @param _event 事件
+ * @param _func 注册函数
+ * @param ... 参数
+ */
+#define CEVENT_EXPORT_ALIAS(_alias, _event, _func, ...) \
+        const void *cEventParam##_event##_func##_alias[] = {(void *)_func, ##__VA_ARGS__}; \
+        const CEvent SECTION("cEvent") cEvent##_event##_func##_alias = \
+        { \
+            .param = cEventParam##_event##_func##_alias, \
+            .paramNum = sizeof(cEventParam##_event##_func##_alias) / sizeof(void *), \
             .event = _event, \
         }
 
