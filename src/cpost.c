@@ -48,8 +48,8 @@ signed char cpostAddHandler(CpostParam *param)
     {
         if (cposhHandlers[i].handler == NULL)
         {
-            cposhHandlers[i].time = 
-                param->delay ? CPOST_GET_TICK() + param->delay : 0;
+            cposhHandlers[i].startTime = CPOST_GET_TICK();
+            cposhHandlers[i].delay = param->delay;
             cposhHandlers[i].handler = (void (*)(void *))(param->handler);
             cposhHandlers[i].param = param->param;
             return 0;
@@ -120,10 +120,10 @@ void cpostProcess(void)
         if (cposhHandlers[i].handler)
         {
             tick = CPOST_GET_TICK();
-            if (cposhHandlers[i].time == 0 || 
-                (tick >= cposhHandlers[i].time 
-                    ? CPOST_GET_TICK() >= cposhHandlers[i].time
-                    : CPOST_MAX_TICK - cposhHandlers[i].time + CPOST_GET_TICK()))
+            if (cposhHandlers[i].delay == 0 || 
+                (CPOST_MAX_TICK - cposhHandlers[i].startTime > cposhHandlers[i].delay
+                    ? tick - cposhHandlers[i].startTime >= cposhHandlers[i].delay
+                    : CPOST_MAX_TICK - cposhHandlers[i].startTime + tick >= cposhHandlers[i].delay))
             {
                 cposhHandlers[i].handler(cposhHandlers[i].param);
                 cposhHandlers[i].handler = NULL;
@@ -131,4 +131,3 @@ void cpostProcess(void)
         }
     }
 }
-

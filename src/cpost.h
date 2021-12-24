@@ -11,7 +11,7 @@
 #ifndef __CPOST_H__
 #define __CPOST_H__
 
-#define     CPOST_VERSION               "1.0.1"
+#define     CPOST_VERSION               "1.0.2"
 
 #define     CPOST_FLAG_CLEAR_FRONT      0           // post列表中，存在相同handler, 清除之前的post
 #define     CPOST_FLAG_CANCEL_CURRENT   1           // post列表中，存在相同handler, 取消当前post
@@ -34,7 +34,8 @@
 
 typedef struct
 {
-    size_t time;
+    size_t startTime;
+    size_t delay;
     void (*handler)(void *);
     void *param;
 } CpostHandler;
@@ -82,4 +83,3 @@ void cpostRemoveAll(void);
 
 signed char cpostIsInList(void *handler);
 #endif
-
