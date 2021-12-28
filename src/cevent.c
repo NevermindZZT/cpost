@@ -49,6 +49,14 @@ void ceventInit(void)
     ceventTable.count = ((unsigned int)(&_cevent_end)
                             - (unsigned int)(&_cevent_start))
                             / sizeof(CEvent);
+#elif defined(__ICCRL__)
+    __far unsigned int *__near p1;
+    __far unsigned int *__near p2;
+
+    ceventTable.base = (CEvent *)(__sectop("cEvent_n"));
+    p1 = __secend("cEvent_n");
+    p2 = __sectop("cEvent_n");
+    ceventTable.count = (*p1 - *p2) / sizeof(CEvent);
 #else
     #error not supported compiler, please use command table mode
 #endif
@@ -66,7 +74,12 @@ static void ceventRun(CEvent *cevent)
     {
         return;
     }
+#ifdef __ICCRL__
+    //这里有个隐含条件, 所有用到事件导出的函数, 其定义必须是near地址
+    void (__near *function)() = (void (__near *)())(cevent->param[0]);
+#else
     void (*function)() = (void (*)())(cevent->param[0]);
+#endif // !__ICCRL__
     switch (cevent->paramNum)
     {
     case 1:
