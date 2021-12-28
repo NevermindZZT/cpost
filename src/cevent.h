@@ -11,7 +11,7 @@
 #ifndef __CEVENT_H__
 #define __CEVENT_H__
 
-#define     CEVENT_VERSION          "1.0.0"
+#define     CEVENT_VERSION          "1.0.1"
 
 #ifndef SECTION
     #if defined(__CC_ARM) || (defined(__ARMCC_VERSION) && __ARMCC_VERSION >= 6000000)
@@ -25,6 +25,28 @@
     #endif
 #endif
 
+#ifdef __ICCRL__
+/**
+ * 
+ * 注意: CCRL编译器无法使用宏定义 CEVENT_EXPORT, 所以导出事件必须用如下方式
+
+CEVENT_PARAM;
+#pragma section const cEvent
+CEVENT_FUNC(0, handler, (void *)param);
+#pragma section
+
+ */
+#define CEVENT_PARAM(_event, _func, ...) \
+    const void *cEventParam##_event##_func[] = {(void *)_func, ##__VA_ARGS__}
+#define CEVENT_FUNC(_event, _func, ...) \
+    const CEvent cEvent##_event##_func = \
+    { \
+        .param = cEventParam##_event##_func, \
+        .paramNum = sizeof(cEventParam##_event##_func) / sizeof(void *), \
+        .event = _event, \
+    }
+
+#else
 /**
  * @brief 导出事件
  * 
@@ -59,6 +81,7 @@
             .paramNum = sizeof(cEventParam##_event##_func##_alias) / sizeof(void *), \
             .event = _event, \
         }
+#endif // !__ICCRL__
 
 /**
  * @brief CEvent
