@@ -9,7 +9,6 @@ c语言程序上下文切换和解耦的工具
   - [cevent使用](#cevent使用)
   - [Api](#api)
     - [post](#post)
-    - [post delay](#post-delay)
     - [event post](#event-post)
     - [event export](#event-export)
 
@@ -79,63 +78,35 @@ _cevent_end = .;
 
 ### post
 
-post接口会将函数抛出，然后在`cpostProcess`中立刻执行
+`cpost` 提供一个统一接口 `cpost(...)` 进行事件抛出，此接口通过宏定义，需要在 c99 以上的标准运行
 
 ```c
-signed char cpost(void *handler);
+#define cpost(...) \
+        cpostAddHandler(&((CpostParam){__VA_ARGS__}))
 ```
 
 - 参数
 
-  - `handler` 被抛出的函数
+  - `...` 抛出的参数，用于构造 `CpostParam` 对象
 
-- 返回值
+  ```c
+  typedef struct
+  {
+      void *handler;
+      void *param;
+      size_t delay;
+      struct {
+          unsigned char flag : 2;
+          unsigned char paramDiff: 1;
+      } attrs;
+  } CpostParam;
+  ```
 
-  - `signed char` 0 post成功 -1 post失败
-
-```c
-signed char cpostEx(void *handler, void *param);
-```
-
-- 参数
-
-  - `handler` 被抛出的函数
-  - `param` 传递给被抛出函数的参数
-
-- 返回值
-
-  - `signed char` 0 post成功 -1 post失败
-
-### post delay
-
-post delay接口会将函数抛出，然后在挂起在`cpostProcess`中，当延时时间达到后执行
-
-```c
-signed char cpostDelay(void *handler, size_t delay);
-```
-
-- 参数
-
-  - `handler` 被抛出的函数
-  - `delay` 延时时间(tick)
-
-- 返回值
-
-  - `signed char` 0 post成功 -1 post失败
-
-```c
-signed char cpostDelayEx(void *handler, void *param, size_t delay);
-```
-
-- 参数
-
-  - `handler` 被抛出的函数
-  - `param` 传递给被抛出函数的参数
-  - `delay` 延时时间(tick)
-
-- 返回值
-
-  - `signed char` 0 post成功 -1 post失败
+  - `handler` 被抛出执行的函数
+  - `param` 传递给函数的参数
+  - `delay` 延迟时间
+  - `attrs.flag` 任务冲突时处理 flag
+  - `attrs.paramDiff` 比较任务时是否区分参数
 
 ### event post
 

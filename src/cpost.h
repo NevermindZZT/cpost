@@ -11,11 +11,14 @@
 #ifndef __CPOST_H__
 #define __CPOST_H__
 
-#define     CPOST_VERSION               "1.0.2"
+#define     CPOST_VERSION               "1.0.3"
 
 #define     CPOST_FLAG_CLEAR_FRONT      0           // post列表中，存在相同handler, 清除之前的post
 #define     CPOST_FLAG_CANCEL_CURRENT   1           // post列表中，存在相同handler, 取消当前post
 #define     CPOST_FLAG_ADD_NEW          2           // 添加新post，不论post列表中是否存在相同handler
+
+#define     CPOST_PARAM_DIFF_DISALBE    0           // 判断是否相同的handler时，忽略参数
+#define     CPOST_PARAM_DIFF_ENABLE     1           // 判断是否相同的handler时，包括参数的比较
 
 /**
  * @brief 最大handler数量
@@ -47,6 +50,7 @@ typedef struct
     size_t delay;
     struct {
         unsigned char flag : 2;
+        unsigned char paramDiff: 1;
     } attrs;
 } CpostParam;
 
@@ -77,9 +81,9 @@ signed char cpostAddHandler(CpostParam *param);
 
 void cpostProcess(void);
 
-void cpostRemove(void *handler);
+void cpostRemove(void *handler, void *param);
 
 void cpostRemoveAll(void);
 
-signed char cpostIsInList(void *handler);
+signed char cpostIsInList(void *handler, void *param);
 #endif

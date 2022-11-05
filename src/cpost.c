@@ -23,12 +23,12 @@ CpostHandler cposhHandlers[CPOST_MAX_HANDLER_SIZE] = {0};
  */
 signed char cpostAddHandler(CpostParam *param)
 {
-    if (cpostIsInList(param->handler) == 0)
+    if (cpostIsInList(param->handler, param->attrs.paramDiff ? param->param : NULL) == 0)
     {
         switch (param->attrs.flag)
         {
         case CPOST_FLAG_CLEAR_FRONT:
-            cpostRemove(param->handler);
+            cpostRemove(param->handler, param->attrs.paramDiff ? param->param : NULL);
             break;
 
         case CPOST_FLAG_CANCEL_CURRENT:
@@ -63,13 +63,15 @@ signed char cpostAddHandler(CpostParam *param)
  * @brief 移除handler
  * 
  * @param handler handler
+ * @param param 参数，传 `NULL` 表示不比较参数
  * 
  */
-void cpostRemove(void *handler)
+void cpostRemove(void *handler, void *param)
 {
     for (size_t i = 0; i < CPOST_MAX_HANDLER_SIZE; i++)
     {
-        if (cposhHandlers[i].handler == handler)
+        if (cposhHandlers[i].handler == handler
+            && (param == NULL || param == cposhHandlers[i].param))
         {
             cposhHandlers[i].handler = NULL;
         }
@@ -93,14 +95,16 @@ void cpostRemoveAll(void)
  * @brief 判断handler是否已经在列表中
  * 
  * @param handler handler
+ * @param param 参数，传 `NULL` 表示不比较参数
  * 
  * @return signed char 0 存在 -1 不存在
  */
-signed char cpostIsInList(void *handler)
+signed char cpostIsInList(void *handler, void *param)
 {
     for (size_t i = 0; i < CPOST_MAX_HANDLER_SIZE; i++)
     {
-        if (cposhHandlers[i].handler == handler)
+        if (cposhHandlers[i].handler == handler
+            && (param == NULL || param == cposhHandlers[i].param))
         {
             return 0;
         }

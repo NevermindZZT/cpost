@@ -11,13 +11,17 @@
 #include "cevent.h"
 
 #if defined(__CC_ARM) || (defined(__ARMCC_VERSION) && __ARMCC_VERSION >= 6000000)
-    extern const unsigned int cEvent$$Base;
-    extern const unsigned int cEvent$$Limit;
+    extern const size_t cEvent$$Base;
+    extern const size_t cEvent$$Limit;
 #elif defined(__ICCARM__) || defined(__ICCRX__)
     #pragma section="cEvent"
 #elif defined(__GNUC__)
-    extern const unsigned int _cevent_start;
-    extern const unsigned int _cevent_end;
+    extern const size_t _cevent_start;
+    extern const size_t _cevent_end;
+#endif
+
+#if CEVENT_SPEED_OPTIMIZE == 1 && CEVENT_BUFFER_SIZE > 0
+static size_t ceventBuffer[CEVENT_BUFFER_SIZE] = {0};
 #endif
 
 /**
@@ -25,8 +29,12 @@
  */
 struct 
 {
+#if CEVENT_SPEED_OPTIMIZE == 1
+    size_t **eventBase;                 /**< 事件基址 */
+#else
     CEvent *base;                       /**< 表基址 */
     size_t count;                       /**< 表大小 */
+#endif
 } ceventTable;
 
 /**
@@ -34,23 +42,50 @@ struct
  */
 void ceventInit(void)
 {
+    CEvent *base;
+    size_t count;
 #if defined(__CC_ARM) || (defined(__ARMCC_VERSION) && __ARMCC_VERSION >= 6000000)
-    ceventTable.base = (CEvent *)(&cEvent$$Base);
-    ceventTable.count = ((unsigned int)(&cEvent$$Limit)
-                            - (unsigned int)(&cEvent$$Base))
-                            / sizeof(CEvent);
+    base = (CEvent *)(&cEvent$$Base);
+    count = ((size_t)(&cEvent$$Limit) - (size_t)(&cEvent$$Base)) / sizeof(CEvent);
 #elif defined(__ICCARM__) || defined(__ICCRX__)
-    ceventTable.base = (CEvent *)(__section_begin("cEvent"));
-    ceventTable.count = ((unsigned int)(__section_end("cEvent"))
-                            - (unsigned int)(__section_begin("cEvent")))
-                            / sizeof(CEvent);
+    base = (CEvent *)(__section_begin("cEvent"));
+    count = ((size_t)(__section_end("cEvent")) - (size_t)(__section_begin("cEvent")))
+            / sizeof(CEvent);
 #elif defined(__GNUC__)
-    ceventTable.base = (CEvent *)(&_cevent_start);
-    ceventTable.count = ((unsigned int)(&_cevent_end)
-                            - (unsigned int)(&_cevent_start))
-                            / sizeof(CEvent);
+    base = (CEvent *)(&_cevent_start);
+    count = ((size_t)(&_cevent_end) - (size_t)(&_cevent_start)) / sizeof(CEvent);
 #else
     #error not supported compiler, please use command table mode
+#endif
+
+#if CEVENT_SPEED_OPTIMIZE == 1
+    size_t maxEvent = 0;
+    for (size_t i = 0; i < count; i++)
+    {
+        if (base[i].event > maxEvent) {
+            maxEvent = base[i].event;
+        }
+    }
+    maxEvent += 1;
+#if CEVENT_BUFFER_SIZE <= 0
+    size_t *ceventBuffer = CEVENT_MALLOC(((maxEvent << 1) + count) * sizeof(size_t));
+#endif /** CEVENT_BUFFER_SIZE <= 0 */
+    ceventTable.eventBase = (size_t **) ceventBuffer;
+    size_t *cur = ceventBuffer + maxEvent;
+    for (size_t i = 0; i < maxEvent; i++)
+    {
+        ceventTable.eventBase[i] = cur;
+        for (size_t j = 0; j < count; j++)
+        {
+            if (base[j].event == i) {
+                *cur++ = (size_t) &base[j];
+            }
+        }
+        *cur++ = NULL;
+    }
+#else /** CEVENT_SPEED_OPTIMIZE == 1 */
+    ceventTable.base = base;
+    ceventTable.count = count;
 #endif
 }
 
@@ -109,6 +144,13 @@ static void ceventRun(CEvent *cevent)
  */
 static void ceventHandler(unsigned short event)
 {
+#if CEVENT_SPEED_OPTIMIZE == 1
+    CEvent **cevent = (CEvent **) ceventTable.eventBase[event];
+    while (*cevent != NULL)
+    {
+        ceventRun(*cevent++);
+    }
+#else
     for (size_t i = 0; i < ceventTable.count; i++)
     {
         if (ceventTable.base[i].event == event)
@@ -116,6 +158,7 @@ static void ceventHandler(unsigned short event)
             ceventRun(&(ceventTable.base[i]));
         }
     }
+#endif
 }
 
 /**

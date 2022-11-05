@@ -11,7 +11,32 @@
 #ifndef __CEVENT_H__
 #define __CEVENT_H__
 
-#define     CEVENT_VERSION          "1.0.0"
+#define     CEVENT_VERSION          "1.0.1"
+
+/**
+ * @brief cevent 速度优化
+ *        打开这个开关需要同时配置 `CEVENT_BUFFER_SIZE` 或者 `CEVENT_MALLOC`
+ *        开启后，cevent 会使用一部分内存，将所有注册的监听进行重排序，建立索引表，
+ *        这样每次触发事件时就不需要进行遍历，能节省调用时间
+ */
+#define     CEVENT_SPEED_OPTIMIZE   1
+
+/**
+ * @brief cevent buffer
+ *        `CEVENT_SPEED_OPTIMIZE` 开启时生效，这块内存用作速度优化
+ *        buffer 大小计算为 `(maxEvent + 1) * 2 + ceventNum`
+ *        (定义的最大事件号 + 1) * 2 + 注册的监听数量
+ *        需要保证定义的数量大于这个数
+ *        如果 `CEVENT_BUFFER_SIZE` 设置为 `0`, 则表示使用 `CEVENT_MALLOC` 分配内存
+ */
+#define     CEVENT_BUFFER_SIZE      64
+
+/**
+ * @brief 内存分配函数
+ *        `CEVENT_SPEED_OPTIMIZE` 打开且 `CEVENT_BUFFER_SIZE` 配置为 `0` 时，
+ *        需要配置这个宏
+ */
+#define     CEVENT_MALLOC(x)        0
 
 #ifndef SECTION
     #if defined(__CC_ARM) || (defined(__ARMCC_VERSION) && __ARMCC_VERSION >= 6000000)
