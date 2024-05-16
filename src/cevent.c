@@ -101,36 +101,63 @@ static void ceventRun(CEvent *cevent)
     {
         return;
     }
-    void (*function)() = (void (*)())(cevent->param[0]);
     switch (cevent->paramNum)
     {
     case 1:
+    {
+        void (*function)() = (void (*)())(cevent->param[0]);
         function();
         break;
+    }
     case 2:
+    {
+        void (*function)(const void *) = (void (*)())(cevent->param[0]);
         function(cevent->param[1]);
         break;
+    }
     case 3:
+    {
+        void (*function)(const void *, const void *) = (void (*)())(cevent->param[0]);
         function(cevent->param[1], cevent->param[2]);
         break;
+    }
     case 4:
+    {
+        void (*function)(const void *, const void *, const void *) = (void (*)())(cevent->param[0]);
         function(cevent->param[1], cevent->param[2], cevent->param[3]);
         break;
+    }
     case 5:
+    {
+        void (*function)(const void *, const void *, const void *, const void *) =
+            (void (*)())(cevent->param[0]);
         function(cevent->param[1], cevent->param[2], cevent->param[3], cevent->param[4]);
         break;
+    }
     case 6:
+    {
+        void (*function)(const void *, const void *, const void *, const void *,
+            const void *) = (void (*)())(cevent->param[0]);
         function(cevent->param[1], cevent->param[2], cevent->param[3], cevent->param[4],
                  cevent->param[5]);
         break;
+    }
     case 7:
+    {
+        void (*function)(const void *, const void *, const void *, const void *,
+            const void *, const void *) = (void (*)())(cevent->param[0]);
         function(cevent->param[1], cevent->param[2], cevent->param[3], cevent->param[4],
                  cevent->param[5], cevent->param[6]);
         break;
+    }
     case 8:
+    {
+        void (*function)(const void *, const void *, const void *, const void *,
+            const void *, const void *, const void *) = (void (*)())(cevent->param[0]);
         function(cevent->param[1], cevent->param[2], cevent->param[3], cevent->param[4],
                  cevent->param[5], cevent->param[6], cevent->param[7]);
         break;
+    }
     default:
         break;
     }

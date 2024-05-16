@@ -11,7 +11,7 @@
 #ifndef __CEVENT_H__
 #define __CEVENT_H__
 
-#define     CEVENT_VERSION          "1.0.1"
+#define     CEVENT_VERSION          "1.0.2"
 
 /**
  * @brief cevent 速度优化
