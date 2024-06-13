@@ -11,6 +11,10 @@
 #ifndef __CPOST_H__
 #define __CPOST_H__
 
+#ifdef CPOST_CFG_USER
+    #include CPOST_CFG_USER
+#endif
+
 #define     CPOST_VERSION               "1.0.3"
 
 #define     CPOST_FLAG_CLEAR_FRONT      0           // post列表中，存在相同handler, 清除之前的post
@@ -20,20 +24,26 @@
 #define     CPOST_PARAM_DIFF_DISALBE    0           // 判断是否相同的handler时，忽略参数
 #define     CPOST_PARAM_DIFF_ENABLE     1           // 判断是否相同的handler时，包括参数的比较
 
-/**
- * @brief 最大handler数量
- */
-#define     CPOST_MAX_HANDLER_SIZE      16
+#ifndef CPOST_MAX_HANDLER_SIZE
+    /**
+    * @brief 最大handler数量
+    */
+    #define     CPOST_MAX_HANDLER_SIZE      16
+#endif
 
-/**
- * @brief 获取系统tick函数
- */
-#define     CPOST_GET_TICK()            0
+#ifndef CPOST_GET_TICK
+    /**
+    * @brief 获取系统tick函数
+    */
+    #define     CPOST_GET_TICK()            0
+#endif
 
-/**
- * @brief tick最大值
- */
-#define     CPOST_MAX_TICK              0xFFFFFFFF
+#ifndef CPOST_MAX_TICK
+    /**
+    * @brief tick最大值
+    */
+    #define     CPOST_MAX_TICK              0xFFFFFFFF
+#endif
 
 typedef struct
 {
