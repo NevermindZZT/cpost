@@ -11,7 +11,7 @@
 #include "cpost.h"
 
 
-CpostHandler cposhHandlers[CPOST_MAX_HANDLER_SIZE] = {0};
+CpostHandler cpostHandlers[CPOST_MAX_HANDLER_SIZE] = {0};
 
 
 /**
@@ -46,12 +46,15 @@ signed char cpostAddHandler(CpostParam *param)
 
     for (size_t i = 0; i < CPOST_MAX_HANDLER_SIZE; i++)
     {
-        if (cposhHandlers[i].handler == NULL)
+        if (cpostHandlers[i].handler == NULL)
         {
-            cposhHandlers[i].startTime = CPOST_GET_TICK();
-            cposhHandlers[i].delay = param->delay;
-            cposhHandlers[i].handler = (void (*)(void *))(param->handler);
-            cposhHandlers[i].param = param->param;
+        #if CPOST_MULTI_PROCESS == 1
+            cpostHandlers[i].process = param->process;
+        #endif
+            cpostHandlers[i].startTime = CPOST_GET_TICK();
+            cpostHandlers[i].delay = param->delay;
+            cpostHandlers[i].handler = (void (*)(void *))(param->handler);
+            cpostHandlers[i].param = param->param;
             return 0;
         }
     }
@@ -70,10 +73,10 @@ void cpostRemove(void *handler, void *param)
 {
     for (size_t i = 0; i < CPOST_MAX_HANDLER_SIZE; i++)
     {
-        if (cposhHandlers[i].handler == handler
-            && (param == NULL || param == cposhHandlers[i].param))
+        if (cpostHandlers[i].handler == handler
+            && (param == NULL || param == cpostHandlers[i].param))
         {
-            cposhHandlers[i].handler = NULL;
+            cpostHandlers[i].handler = NULL;
         }
     }
 }
@@ -86,7 +89,7 @@ void cpostRemoveAll(void)
 {
     for (size_t i = 0; i < CPOST_MAX_HANDLER_SIZE; i++)
     {
-        cposhHandlers[i].handler = NULL;
+        cpostHandlers[i].handler = NULL;
     }
 }
 
@@ -103,8 +106,8 @@ signed char cpostIsInList(void *handler, void *param)
 {
     for (size_t i = 0; i < CPOST_MAX_HANDLER_SIZE; i++)
     {
-        if (cposhHandlers[i].handler == handler
-            && (param == NULL || param == cposhHandlers[i].param))
+        if (cpostHandlers[i].handler == handler
+            && (param == NULL || param == cpostHandlers[i].param))
         {
             return 0;
         }
@@ -116,21 +119,29 @@ signed char cpostIsInList(void *handler, void *param)
  * @brief cpost 处理
  * 
  */
+#if CPOST_MULTI_PROCESS == 1
+void cpostProcess(size_t process)
+#else
 void cpostProcess(void)
+#endif
 {
     size_t tick;
     for (size_t i = 0; i < CPOST_MAX_HANDLER_SIZE; i++)
     {
-        if (cposhHandlers[i].handler)
+    #if CPOST_MULTI_PROCESS == 1
+        if (cpostHandlers[i].handler &&  cpostHandlers[i].process == process)
+    #else
+        if (cpostHandlers[i].handler)
+    #endif
         {
             tick = CPOST_GET_TICK();
-            if (cposhHandlers[i].delay == 0 || 
-                (CPOST_MAX_TICK - cposhHandlers[i].startTime > cposhHandlers[i].delay
-                    ? tick - cposhHandlers[i].startTime >= cposhHandlers[i].delay
-                    : CPOST_MAX_TICK - cposhHandlers[i].startTime + tick >= cposhHandlers[i].delay))
+            if (cpostHandlers[i].delay == 0 || 
+                (CPOST_MAX_TICK - cpostHandlers[i].startTime > cpostHandlers[i].delay
+                    ? tick - cpostHandlers[i].startTime >= cpostHandlers[i].delay
+                    : CPOST_MAX_TICK - cpostHandlers[i].startTime + tick >= cpostHandlers[i].delay))
             {
-                cposhHandlers[i].handler(cposhHandlers[i].param);
-                cposhHandlers[i].handler = NULL;
+                cpostHandlers[i].handler(cpostHandlers[i].param);
+                cpostHandlers[i].handler = NULL;
             }
         }
     }

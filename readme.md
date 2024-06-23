@@ -38,6 +38,10 @@ c语言程序上下文切换和解耦的工具
 
     在main loop调用`cpostProcess`函数，通过`cpost`执行的函数都会在`cpostProcess`中执行
 
+3. 多进程使用
+
+    有些情况下，我们可能有多个上下文环境需要切换，比如说在多核处理器中，希望能够指定任务运行在那个核心，这时候，可以使能`CPOST_MULTI_PROCESS`，然后在不同的上下文环境调用`cpostProcess`，并且在`cpost`中指定`process`参数，即可在对应的上下文环境中执行
+
 ## cevent使用
 
 `cevent`使用注册的方式监听事件，会依赖于编译环境，目前支持keil，iar，和gcc，对于gcc，需要修改链接文件(.ld)，在只读数据区添加：
@@ -92,6 +96,9 @@ _cevent_end = .;
   ```c
   typedef struct
   {
+  #if CPOST_MULTI_PROCESS == 1
+      size_t process;
+  #endif
       void *handler;
       void *param;
       size_t delay;
@@ -102,6 +109,7 @@ _cevent_end = .;
   } CpostParam;
   ```
 
+  - `process` process id, 多进程下使用
   - `handler` 被抛出执行的函数
   - `param` 传递给函数的参数
   - `delay` 延迟时间

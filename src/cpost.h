@@ -15,7 +15,7 @@
     #include CPOST_CFG_USER
 #endif
 
-#define     CPOST_VERSION               "1.0.3"
+#define     CPOST_VERSION               "1.0.4"
 
 #define     CPOST_FLAG_CLEAR_FRONT      0           // post列表中，存在相同handler, 清除之前的post
 #define     CPOST_FLAG_CANCEL_CURRENT   1           // post列表中，存在相同handler, 取消当前post
@@ -45,8 +45,18 @@
     #define     CPOST_MAX_TICK              0xFFFFFFFF
 #endif
 
+#ifndef CPOST_MULTI_PROCESS
+    /**
+    * @brief 是否支持多个 Process
+    */
+    #define     CPOST_MULTI_PROCESS         0
+#endif
+
 typedef struct
 {
+#if CPOST_MULTI_PROCESS == 1
+    size_t process;
+#endif
     size_t startTime;
     size_t delay;
     void (*handler)(void *);
@@ -55,6 +65,9 @@ typedef struct
 
 typedef struct
 {
+#if CPOST_MULTI_PROCESS == 1
+    size_t process;
+#endif
     void *handler;
     void *param;
     size_t delay;
@@ -78,6 +91,7 @@ typedef struct
 #define cpost(...) \
         cpostAddHandler(&((CpostParam){__VA_ARGS__}))
 
+#if CPOST_MULTI_PROCESS != 1
 #define cpostDelay(_handler, _delay) \
         cpost(_handler, .delay=_delay)
 
@@ -86,10 +100,15 @@ typedef struct
 
 #define cpostDelayEx(_handler, _param, _delay) \
         cpost(_handler, _param, _delay)
+#endif
 
 signed char cpostAddHandler(CpostParam *param);
 
+#if CPOST_MULTI_PROCESS == 1
+void cpostProcess(size_t process);
+#else
 void cpostProcess(void);
+#endif
 
 void cpostRemove(void *handler, void *param);
 
