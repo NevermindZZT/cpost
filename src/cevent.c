@@ -31,6 +31,7 @@ struct
 {
 #if CEVENT_SPEED_OPTIMIZE == 1
     size_t **eventBase;                 /**< 事件基址 */
+    size_t maxEventNum;					/**< 最大事件 */
 #else
     CEvent *base;                       /**< 表基址 */
     size_t count;                       /**< 表大小 */
@@ -71,6 +72,7 @@ void ceventInit(void)
     size_t *ceventBuffer = CEVENT_MALLOC(((maxEvent << 1) + count) * sizeof(size_t));
 #endif /** CEVENT_BUFFER_SIZE <= 0 */
     ceventTable.eventBase = (size_t **) ceventBuffer;
+    ceventTable.maxEventNum = maxEvent;
     size_t *cur = ceventBuffer + maxEvent;
     for (size_t i = 0; i < maxEvent; i++)
     {
@@ -172,6 +174,7 @@ static void ceventRun(CEvent *cevent)
 static void ceventHandler(unsigned short event)
 {
 #if CEVENT_SPEED_OPTIMIZE == 1
+    if (event >= ceventTable.maxEventNum) return;
     CEvent **cevent = (CEvent **) ceventTable.eventBase[event];
     while (*cevent != NULL)
     {
